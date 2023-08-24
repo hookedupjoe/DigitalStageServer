@@ -35,10 +35,25 @@ module.exports.setup = function setup(scope,options) {
         wsRoom.sendDataToAll({action:'people', people: getPeopleSummary()});
     }
 
+    
+    function sendChat(theWS, theData){
+        try {
+            var tmpChat = theData.chat;
+            var tmpUserID = theWS.userid;
+            console.log('tmpUserID',tmpUserID,users);
+            
+            var tmpName = users[tmpUserID].profile.name;
+            wsRoom.sendDataToAll({action:'chat', fromid: tmpUserID, fromname: tmpName, chat: tmpChat})
+        } catch (error) {
+            console.error("Error in send chat",error);
+        }
+    }
+
     function updateProfile(theWS, theData){
         var tmpSocketID = theWS.id;
         var tmpUserID = theData.userid;
         var tmpProfile = theData.profile;
+        theWS.userid = tmpUserID;
 
         users[tmpUserID] = {
             socketid: tmpSocketID,
@@ -68,11 +83,13 @@ module.exports.setup = function setup(scope,options) {
         }
         if( tmpData.action ){
             if( tmpData.action == 'profile' && tmpData.profile){
-                //updateProfile(ws.id,tmpData.profile);
                 updateProfile(ws,tmpData);
+            } else if( tmpData.action == 'chat' && tmpData.chat){
+                sendChat(ws,tmpData);
             }
         }
     }
+
     function onSocketAdd(theID){
         //people[theID] = {profile:{name:''}};
         console.log('onSocketAdd from websocket room',theID );
