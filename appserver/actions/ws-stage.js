@@ -1,7 +1,7 @@
 'use strict';
-
 const THIS_MODULE_NAME = 'ws-stage';
 const THIS_MODULE_TITLE = 'Send and receive Websock data related to the stage';
+
 var isSetup = false;
 var wssMain = false;
 var wsRoom;
