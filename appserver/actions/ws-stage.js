@@ -38,12 +38,19 @@ module.exports.setup = function setup(scope,options) {
     
     function sendChat(theWS, theData){
         try {
-            var tmpChat = theData.chat;
+            var tmpMsg = theData.message;
             var tmpUserID = theWS.userid;
-            //console.log('tmpUserID',tmpUserID,users);
+            console.log('tmpMsg',tmpMsg);
             
+            //ToDo: add who it is to and vis
             var tmpName = users[tmpUserID].profile.name;
-            wsRoom.sendDataToAll({action:'chat', fromid: tmpUserID, fromname: tmpName, chat: tmpChat})
+
+            var tmpNameTo = '';
+            if( users[tmpMsg.to] ){
+                tmpNameTo = users[tmpMsg.to].profile.name
+            }
+
+            wsRoom.sendDataToAll({action:'chat', fromid: tmpUserID, fromname: tmpName, message: tmpMsg, toname: tmpNameTo})
         } catch (error) {
             console.error("Error in send chat",error);
         }
@@ -84,7 +91,7 @@ module.exports.setup = function setup(scope,options) {
         if( tmpData.action ){
             if( tmpData.action == 'profile' && tmpData.profile){
                 updateProfile(ws,tmpData);
-            } else if( tmpData.action == 'chat' && tmpData.chat){
+            } else if( tmpData.action == 'chat'){
                 sendChat(ws,tmpData);
             }
         }
