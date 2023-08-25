@@ -47,10 +47,16 @@ module.exports.setup = function setup(scope,options) {
 
             var tmpNameTo = '';
             if( users[tmpMsg.to] ){
+                var tmpUser = users[tmpMsg.to];
+                var tmpSocketID = tmpUser.socketid;
+                console.log('tmpSocketID tmpUser',tmpSocketID, tmpUser);
                 tmpNameTo = users[tmpMsg.to].profile.name
             }
-
-            wsRoom.sendDataToAll({action:'chat', fromid: tmpUserID, fromname: tmpName, message: tmpMsg, toname: tmpNameTo})
+            if( tmpMsg.to && (tmpMsg.vis == 'private')){
+                wsRoom.sendDataToClient(tmpSocketID, {action:'chat', fromid: tmpUserID, fromname: tmpName, message: tmpMsg, toname: tmpNameTo})
+            } else {
+                wsRoom.sendDataToAll({action:'chat', fromid: tmpUserID, fromname: tmpName, message: tmpMsg, toname: tmpNameTo})
+            }
         } catch (error) {
             console.error("Error in send chat",error);
         }
