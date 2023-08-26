@@ -54,6 +54,7 @@ module.exports.setup = function setup(scope,options) {
             }
             if( tmpMsg.to && (tmpMsg.vis == 'private')){
                 wsRoom.sendDataToClient(tmpSocketID, {action:'chat', fromid: tmpUserID, fromname: tmpName, message: tmpMsg, toname: tmpNameTo})
+                wsRoom.sendDataToClient(theWS.id, {action:'chat', fromid: tmpUserID, fromname: tmpName, message: tmpMsg, toname: tmpNameTo})
             } else {
                 wsRoom.sendDataToAll({action:'chat', fromid: tmpUserID, fromname: tmpName, message: tmpMsg, toname: tmpNameTo})
             }
