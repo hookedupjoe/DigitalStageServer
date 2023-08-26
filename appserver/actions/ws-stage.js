@@ -49,7 +49,7 @@ module.exports.setup = function setup(scope,options) {
         if( users[tmpMsg.from] ){
             var tmpUser = users[tmpMsg.from];
             var tmpSocketID = tmpUser.socketid;
-            wsRoom.sendDataToClient(tmpSocketID, {action:'meetingresponse', fromid: tmpUserID, fromname: tmpName, message: tmpMsg})
+            wsRoom.sendDataToClient(tmpSocketID, {action:'meetingresponse', answer: theData.answer, fromid: tmpUserID, fromname: tmpName, message: tmpMsg})
         } else {
             console.log('unknown user',tmpMsg)
         }
@@ -64,12 +64,11 @@ module.exports.setup = function setup(scope,options) {
             tmpName = users[tmpUserID].profile.name
         }
 
-
         if( users[theData.to] ){
             var tmpUser = users[theData.to];
             var tmpSocketID = tmpUser.socketid;
-            console.log('req to tmpSocketID',tmpSocketID);
-            wsRoom.sendDataToClient(tmpSocketID, {action:'meetingrequest', fromid: theWS.userid, fromname: tmpName, message: 'Meeting request from ' + tmpName})
+            //console.log('req to tmpSocketID',tmpSocketID);
+            wsRoom.sendDataToClient(tmpSocketID, {action:'meetingrequest', offer: theData.offer, fromid: theWS.userid, fromname: tmpName, message: 'Meeting request from ' + tmpName})
         } else {
             wsRoom.sendDataToClient(theWS.id, {action:'meetingreply', fromid: theWS.userid, status: false, message: 'No longer available'})  
         }
