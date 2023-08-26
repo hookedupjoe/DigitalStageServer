@@ -35,6 +35,48 @@ module.exports.setup = function setup(scope,options) {
         wsRoom.sendDataToAll({action:'people', people: getPeopleSummary()});
     }
 
+    function sendMeetingResponse(theWS, theData){
+        console.log('theData',theData);
+        var tmpMsg = theData.message || {};
+        
+        var tmpName = '';
+        //--- User ID of person making the reply
+        var tmpUserID = theWS.userid;
+        if( users[tmpUserID] ){
+            tmpName = users[tmpUserID].profile.name
+        }
+
+        if( users[tmpMsg.from] ){
+            var tmpUser = users[tmpMsg.from];
+            var tmpSocketID = tmpUser.socketid;
+            wsRoom.sendDataToClient(tmpSocketID, {action:'meetingresponse', fromid: tmpUserID, fromname: tmpName, message: tmpMsg})
+        } else {
+            console.log('unknown user',tmpMsg)
+        }
+
+        
+    }
+    
+    function sendMeetingRequest(theWS, theData){
+        var tmpName = '';
+        var tmpUserID = theWS.userid;
+        if( users[tmpUserID] ){
+            tmpName = users[tmpUserID].profile.name
+        }
+
+
+        if( users[theData.to] ){
+            var tmpUser = users[theData.to];
+            var tmpSocketID = tmpUser.socketid;
+            console.log('req to tmpSocketID',tmpSocketID);
+            wsRoom.sendDataToClient(tmpSocketID, {action:'meetingrequest', fromid: theWS.userid, fromname: tmpName, message: 'Meeting request from ' + tmpName})
+        } else {
+            wsRoom.sendDataToClient(theWS.id, {action:'meetingreply', fromid: theWS.userid, status: false, message: 'No longer available'})  
+        }
+        console.log('sendMeetingRequest',theWS.id, theWS.userid, theData)
+        //wsRoom.sendDataToClient(theWS.id, {action:'chat', fromid: tmpUserID, fromname: tmpName, message: tmpMsg, toname: tmpNameTo})
+
+    }
     
     function sendChat(theWS, theData){
         try {
@@ -94,6 +136,13 @@ module.exports.setup = function setup(scope,options) {
                 updateProfile(ws,tmpData);
             } else if( tmpData.action == 'chat'){
                 sendChat(ws,tmpData);
+            } else if( tmpData.action == 'meeting'){
+                sendMeetingRequest(ws,tmpData);
+            } else if( tmpData.action == 'meetingresponse'){
+                sendMeetingResponse(ws,tmpData);
+                
+            } else {
+                console.log('unknown action',tmpData.action);
             }
         }
     }
