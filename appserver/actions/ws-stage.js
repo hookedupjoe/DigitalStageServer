@@ -40,7 +40,6 @@ module.exports.setup = function setup(scope,options) {
         try {
             var tmpMsg = theData.message;
             var tmpUserID = theWS.userid;
-            console.log('tmpMsg',tmpMsg);
             
             //ToDo: add who it is to and vis
             var tmpName = users[tmpUserID].profile.name;
@@ -49,7 +48,6 @@ module.exports.setup = function setup(scope,options) {
             if( users[tmpMsg.to] ){
                 var tmpUser = users[tmpMsg.to];
                 var tmpSocketID = tmpUser.socketid;
-                console.log('tmpSocketID tmpUser',tmpSocketID, tmpUser);
                 tmpNameTo = users[tmpMsg.to].profile.name
             }
             if( tmpMsg.to && (tmpMsg.vis == 'private')){
@@ -79,18 +77,14 @@ module.exports.setup = function setup(scope,options) {
         clients[tmpSocketID].profile = tmpProfile;
         clients[tmpSocketID].userid = tmpUserID;
         resendPeople();
-        //wsRoom.sendDataToAll({action:'people', people: people});
-        //console.log('updateProfile',clients);
     }
     
     function onConnect(ws){
-        //console.log('onConnect',ws.id);
         ws.userid = $.ws.mgr.getUniqueID();        
         ws.send(JSON.stringify({action: 'welcome', userid: ws.userid, id: ws.id, people:getPeopleSummary()}))
     }
 
     function onMessage(ws,data,isBinary){
-        //console.log('onMessage from websocket room', ws.id, ''+data, isBinary );
         var tmpData = (''+data).trim();
         if( tmpData.startsWith('{')){
             tmpData = JSON.parse(tmpData);
@@ -105,9 +99,7 @@ module.exports.setup = function setup(scope,options) {
     }
 
     function onSocketAdd(theID){
-        //people[theID] = {profile:{name:''}};
-        //console.log('onSocketAdd from websocket room',theID );
-        //wsRoom.sendDataToAll({action:'people', people: people});
+        //--- placeholder
     }
 
     function onSocketRemove(theID){
@@ -118,13 +110,10 @@ module.exports.setup = function setup(scope,options) {
                 //--- Clear socket it to show not active, but keep user with ID here
                 //     ToDo: cleanup to remove inactive after x period?
                 tmpUser.socketid = '';
-                //console.log('cleared socketid',tmpUserID);
             }
             delete clients[theID];
             resendPeople();
-            //wsRoom.sendDataToAll({action:'people', people: people});
         }
-        //console.log('onSocketRemove from websocket room',theID, clients);
     }
 
     if( options.websocket === true ){
